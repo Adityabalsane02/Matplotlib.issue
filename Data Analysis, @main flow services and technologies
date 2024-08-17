@@ -1,0 +1,85 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from datetime import datetime
+
+data = pd.read_csv("E:\\Main flow Internship data analysis\\Task -06/disney_plus_titles.csv")
+print(data.columns.values)
+print("Shape of Dataset is : ",data.shape)
+
+data.head(5)
+data.shape
+data.info()
+
+# Creating new columns from existing column
+data[['g1','g2','g3']] = data['listed_in'].str.split(',', expand = True)
+
+# Removing unnecessary columns
+data.drop(['show_id', 'description', 'listed_in'], axis = 1 ,inplace = True)
+
+# Checking for null values
+data.isnull().sum()
+
+# Filling null values
+data['director'] = data['director'].fillna('without director reference')
+data['director'].isnull().sum()
+
+data['cast'] = data['cast'].fillna('without cast reference')
+data['cast'].isnull().sum()
+
+data['country'] = data['country'].fillna('without country reference')
+data['country'].isnull().sum()
+
+data['rating'] = data['rating'].fillna('without rating')
+data['rating'].isnull().sum()
+
+# Filling null values 
+data.fillna(0, inplace = True)
+data.isnull().sum()
+
+# Checking for duplicated values
+data.duplicated().sum()
+
+"""Questions to be answered-
+
+What are the total number of movies and tv shows released?
+Which year of 20s released more numbers of Movies/TV Shows?
+Show the difference in Movies released and TV Shows released of top 3 year of 20s having the most released.
+Which category of rating has the most number of releases?
+Which year of 20s has released the most Action-Adventure movies/tv shows?"""
+
+
+# Que 1. What are the total number of movies and tv shows released?
+ans1 = data['type'].value_counts()
+ans1
+plt.pie(ans1, labels = ['Movies', 'TV Show'])
+plt.show()
+
+# Que 2. Which year of 20s released more numbers of Movies/TV Shows?
+ans2 = data.query('release_year >= 2000')
+plt.figure(figsize = (12,6))
+sns.set_style('dark')
+sns.countplot(ans2, x = 'release_year')
+plt.grid(True)
+plt.show()
+
+# Que 3. Show the difference in Movies released and TV Shows released of top 3 year of 20s having the most released
+ans3 = data.query('release_year == [2020,2021,2019]')
+sns.countplot(ans2, x = 'release_year', hue = 'type')
+plt.grid(True)
+plt.show()
+
+# Que 4. Which category of rating has the most number of releases?
+ans4 = data['rating'].value_counts()
+ans4
+plt.figure(figsize = (6,6))
+plt.pie(ans4, labels = ['TV-G', 'TV-PG', 'G', 'PG', 'TV-Y7', 'TV-14', 'PG-13', 'TV-Y', 'TV-Y7-FV', 'without rating'])
+plt.show()
+
+# Que 5. Which year of 20s has released the most Action-Adventure movies/tv shows?
+acad = data.query("release_year >= 2000 and g1 == 'Action-Adventure'  or g2 == 'Action-Adventure' or g3 == 'Action-Adventure'")
+plt.figure(figsize = (12,6))
+sns.countplot(acad, x = 'release_year')
+plt.grid(True)
+plt.show()
